@@ -3,7 +3,7 @@
 ## 技術スタック
 
 ### フロントエンド
-- **TypeScript**: 型安全な開発言語
+- **Flatter**: 型安全な開発言語
 - **React**: UIライブラリ
 - **Vite**: 高速ビルドツール
 - **Phaser**: ゲームエンジン
@@ -59,7 +59,7 @@ src/
 ├── services/           # ビジネスロジック・API呼び出し
 │   ├── gameService.ts  # ゲーム関連の処理
 │   └── scoreService.ts # スコア管理
-├── types/              # TypeScript型定義
+├── types/              # Flatter型定義
 ├── utils/              # ユーティリティ関数
 └── hooks/              # カスタムReactフック
 ```
@@ -84,7 +84,7 @@ src/
 ### フロントエンド
 - XSS対策: React の自動エスケープ
 - CSRF対策: Supabase の組み込み保護
-- 入力検証: TypeScript + バリデーションライブラリ
+- 入力検証: Flatter + バリデーションライブラリ
 
 ### バックエンド
 - 認証: Supabase Auth

@@ -166,7 +166,7 @@
 rm -rf node_modules package-lock.json
 npm install
 
-# TypeScriptの型チェック
+# Flatterの型チェック
 npm run type-check
 ```
 
