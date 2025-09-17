@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- メタ情報 -->
+    <title>Gail | 受信箱を守り抜け、ゲーム×メールの冒険へ</title>
+    <meta name="description" content="未読メールをモンスターに、返信を攻撃に変えるゲーム風メールアプリ「Gail」。日常のタスクをRPGの冒険に変え、楽しくInbox Zeroを目指そう。">
+    <!-- OGタグ -->
+    <meta property="og:title" content="Gail | 受信箱を守り抜け、ゲーム×メールの冒険へ">
+    <meta property="og:description" content="メールを倒して、レベルアップ。">
+    <meta property="og:type" content="website">
+    <!-- TODO: OG Image URL -->
+    <!-- <meta property="og:image" content="og_image_url"> -->
+
+    <!-- CSS / Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* UIトークンをCSS変数として定義 */
+        :root {
+            --primary: #2196F3;
+            --onPrimary: #FAFAFA;
+            --secondary: #FFC107;
+            --onSecondary: #121212;
+            --surface: #212121;
+            --onSurface: #FAFAFA;
+            --background: #121212;
+            --onBackground: #FAFAFA;
+            --error: #F44336;
+            --onError: #FAFAFA;
+            --radius-medium: 8px;
+        }
+
+        /* フォント設定 */
+        body {
+            background-color: var(--background);
+            color: var(--onBackground);
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* 拡張コンポーネント: PixelButton */
+        .pixel-button {
+            display: inline-block;
+            padding: 12px 24px;
+            border: 4px solid var(--onSurface);
+            box-shadow: 6px 6px 0 var(--onSurface);
+            transition: all 0.1s ease-in-out;
+            text-transform: uppercase;
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+        }
+
+        .pixel-button:hover {
+            box-shadow: 4px 4px 0 var(--onSurface);
+            transform: translate(2px, 2px);
+        }
+
+        .pixel-button:active {
+            box-shadow: 0px 0px 0 var(--onSurface);
+            transform: translate(6px, 6px);
+        }
+
+        .pixel-button-primary {
+            background-color: var(--primary);
+            color: var(--onPrimary);
+        }
+
+        /* 拡張コンポーネント: HPBar, EXPBar */
+        .status-bar {
+            height: 24px;
+            border: 4px solid var(--onSurface);
+            padding: 2px;
+        }
+
+        .status-bar-fill {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .hp-bar-fill {
+            background-color: #4CAF50;
+        }
+
+        .exp-bar-fill {
+            background-color: var(--primary);
+        }
+
+        .monster-hp-bar-fill {
+            background-color: var(--error);
+        }
+
+        /* ミニデモ用アニメーション */
+        @keyframes flash {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        .flash {
+            animation: flash 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.2s 2;
+        }
+
+        /* ドット絵風SVG */
+        .pixelated {
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <div class="container mx-auto px-6 py-12 md:py-20 text-center">
+
+        <!-- 1. Hero -->
+        <header class="mb-20 md:mb-32">
+            <div class="flex justify-center items-center gap-8 mb-8">
+                <!-- 勇者 -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-24 h-24 md:w-32 md:h-32 pixelated">
+                    <path fill="#FFC107" d="M28 20h8v4h-8z" />
+                    <path fill="#6D4C41" d="M28 24h8v4h-8z" />
+                    <path fill="#FAFAFA" d="M24 28h16v12H24z" />
+                    <path fill="#2196F3" d="M20 40h24v12H20z" />
+                    <path fill="#6D4C41" d="M24 52h4v8h-4zm8 0h4v8h-4z" />
+                </svg>
+                <span class="text-4xl font-bold text-gray-500">VS</span>
+                <!-- 魔物 -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-24 h-24 md:w-32 md:h-32 pixelated">
+                    <path fill="#F44336" d="M20 44c0-11 8-20 20-20s20 9 20 20-8 20-20 20S20 55 20 44z" />
+                    <path fill="#FAFAFA" d="M32 32h4v8h-4zm12 0h4v8h-4z" />
+                    <path fill="#121212" d="M28 52h12v4H28z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl md:text-5xl lg:text-6xl mb-4 leading-tight">メールは魔物。敵を送信せよ。</h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8">受信箱を、守り抜け。</p>
+            <a href="#cta" class="pixel-button pixel-button-primary text-xl">PLAY GAIL</a>
+        </header>
+
+        <!-- 2. Features -->
+        <section id="features" class="mb-20 md:mb-32">
+            <h2 class="text-3xl md:text-4xl mb-12">冒険の始まり</h2>
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12 max-w-4xl mx-auto">
+                <div class="bg-surface p-8 rounded-lg" style="box-shadow: var(--elevation-level-3);">
+                    <h3 class="text-2xl mb-4">未読を倒す</h3>
+                    <p class="text-gray-400">溜まった未読メールは、恐ろしいモンスターの群れ。1通返信するごとに攻撃が発動し、受信箱に平和を取り戻します。</p>
+                </div>
+                <div class="bg-surface p-8 rounded-lg" style="box-shadow: var(--elevation-level-3);">
+                    <h3 class="text-2xl mb-4">報酬を得る</h3>
+                    <p class="text-gray-400">モンスターを倒すと、経験値や強力なアイテムを獲得。キャラクターを成長させ、更なる強敵（大量の未読メール）に立ち向かえ。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Progress & Rewards -->
+        <section id="progress" class="mb-20 md:mb-32 max-w-4xl mx-auto">
+            <h2 class="text-3xl md:text-4xl mb-12">勇者の成長</h2>
+            <div class="bg-surface p-8 rounded-lg space-y-6" style="box-shadow: var(--elevation-level-3);">
+                <div class="flex items-center gap-4">
+                    <span class="text-lg font-bold">HP</span>
+                    <div class="status-bar w-full">
+                        <div class="hp-bar-fill status-bar-fill" style="width: 85%;"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-lg font-bold">EXP</span>
+                    <div class="status-bar w-full">
+                        <div class="exp-bar-fill status-bar-fill" style="width: 40%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl my-6">伝説のアイテム</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+                        <p class="text-lg text-secondary">▶︎ 返信速度の剣</p>
+                        <p class="text-lg text-secondary">▶︎ 集中力の兜</p>
+                        <p class="text-lg text-secondary">▶︎ 誤字脱字の盾</p>
+                        <p class="text-lg text-secondary">▶︎ Inbox Zeroの聖杯</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. How it works (ミニデモ) -->
+        <section id="howitworks" class="mb-20 md:mb-32">
+            <h2 class="text-3xl md:text-4xl mb-12">遊び方</h2>
+            <div class="bg-surface p-8 rounded-lg max-w-4xl mx-auto" style="box-shadow: var(--elevation-level-4);">
+                <div id="mini-demo" class="space-y-6">
+                    <p class="text-xl">未読メールのモンスターが出現！</p>
+                    <!-- モンスターとHPバー -->
+                    <div class="relative w-48 h-48 mx-auto">
+                        <svg id="demo-monster" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"
+                            class="w-full h-full pixelated transition-transform duration-200">
+                            <path fill="#4CAF50" d="M20 44c0-11 8-20 20-20s20 9 20 20-8 20-20 20S20 55 20 44z" />
+                            <path fill="#FAFAFA" d="M32 32h4v8h-4zm12 0h4v8h-4z" />
+                            <path fill="#121212" d="M28 52h12v4H28z" />
+                        </svg>
+                        <div id="damage-text"
+                            class="absolute inset-0 flex items-center justify-center text-4xl font-bold text-red-500 opacity-0 transition-opacity">
+                            -10</div>
+                    </div>
+                    <div class="w-48 mx-auto">
+                        <div class="status-bar w-full">
+                            <div id="monster-hp-fill" class="monster-hp-bar-fill status-bar-fill" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- アクションボタンと結果メッセージ -->
+                    <button id="attack-button" class="pixel-button bg-error text-onError text-lg">返信して攻撃！</button>
+                    <p id="reward-message" class="text-secondary text-xl h-8"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. FAQ -->
+        <section id="faq" class="mb-20 md:mb-32 max-w-4xl mx-auto text-left">
+            <h2 class="text-3xl md:text-4xl mb-12 text-center">よくある質問</h2>
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-xl text-primary mb-2">Q. どのメールサービスで利用できますか？</h3>
+                    <p class="text-gray-300">A. 現在はGmail、Outlookに対応しています。今後のアップデートで対応サービスを拡大予定です。</p>
+                </div>
+                <div>
+                    <h3 class="text-xl text-primary mb-2">Q. 料金はかかりますか？</h3>
+                    <p class="text-gray-300">A. 基本機能はすべて無料でご利用いただけます。より強力なアイテムやキャラクターカスタマイズが可能な有料プランもご用意しています。</p>
+                </div>
+                <div>
+                    <h3 class="text-xl text-primary mb-2">Q. セキュリティは大丈夫ですか？</h3>
+                    <p class="text-gray-300">A. Gailはメールの送受信を安全に行うため、最新の暗号化技術を利用しています。あなたのデータが外部に漏れることはありません。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. CTA -->
+        <footer id="cta" class="py-12 bg-surface">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl mb-6">受信箱を冒険に変えよう</h2>
+                <a href="#" class="pixel-button pixel-button-primary text-2xl mb-6">PLAY GAIL</a>
+                <p class="text-gray-400 mt-4">iOS / Androidで利用可能です</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ミニデモのロジック
+        const attackButton = document.getElementById('attack-button');
+        const monster = document.getElementById('demo-monster');
+        const monsterHpFill = document.getElementById('monster-hp-fill');
+        const rewardMessage = document.getElementById('reward-message');
+        const damageText = document.getElementById('damage-text');
+
+        let monsterHp = 100;
+
+        attackButton.addEventListener('click', () => {
+            if (monsterHp <= 0) return;
+
+            // 攻撃処理
+            monsterHp -= 25;
+            if (monsterHp < 0) monsterHp = 0;
+
+            // 見た目の更新
+            monsterHpFill.style.width = `${monsterHp}%`;
+
+            // ダメージエフェクト
+            monster.classList.add('shake');
+            damageText.textContent = `-${Math.floor(Math.random() * 10) + 20}`; // Random damage text
+            damageText.style.opacity = 1;
+
+            setTimeout(() => {
+                monster.classList.remove('shake');
+                damageText.style.opacity = 0;
+            }, 300);
+
+
+            // 討伐完了
+            if (monsterHp === 0) {
+                rewardMessage.textContent = 'モンスターを倒した！ EXPとGOLDを獲得！';
+                attackButton.textContent = '次のモンスター！';
+                attackButton.classList.remove('bg-error');
+                attackButton.classList.add('bg-secondary', 'text-onSecondary');
+
+                // 3秒後にリセット
+                setTimeout(resetDemo, 3000);
+            }
+        });
+
+        function resetDemo() {
+            monsterHp = 100;
+            monsterHpFill.style.width = '100%';
+            rewardMessage.textContent = '';
+            attackButton.textContent = '返信して攻撃！';
+            attackButton.classList.add('bg-error');
+            attackButton.classList.remove('bg-secondary', 'text-onSecondary');
+        }
+
+    </script>
+</body>
+
+</html>
