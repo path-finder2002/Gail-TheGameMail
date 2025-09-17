@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "post-task-complete": [
+      "npm run format && npm run lint",
+      "npm run typecheck || tsc --noEmit",
+      "npm run test:coverage",
+      "npm run build"
+    ],
+    "pre-pr-ready": [
+      "npm run test:e2e",
+      "node scripts/size-check.mjs --budget 250kb",
+      "node scripts/a11y-lhci.mjs --min-score 90"
+    ],
+    "post-merge-main": [
+      "node scripts/changelog.mjs || true",
+      "node scripts/version-sync.mjs || true",
+      "npm run build",
+      "node scripts/sourcemap-upload.mjs || true",
+      "node scripts/preview-deploy.mjs || true"
+    ],
+    "pre-release": [
+      "npm run test:e2e",
+      "node scripts/supabase-guard.mjs",
+      "node scripts/sbom.mjs || true",
+      "node scripts/sec-audit.mjs || true"
+    ],
+    "post-release": [
+      "node scripts/prod-deploy.mjs",
+      "node scripts/cache-invalidate.mjs || true",
+      "node scripts/rollout-canary.mjs --pct 10 || true",
+      "node scripts/notify.mjs --channels slack,github || true",
+      "node scripts/rollback-point.mjs || true"
+    ]
+  }
+}
