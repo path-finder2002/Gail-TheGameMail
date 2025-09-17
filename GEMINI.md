@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project, "Gail: The Mail Game," is an open-source browser game. The concept is a tower defense game set in an email inbox, where the player has to fight back enemies while handling incoming emails. The game is built with React for the UI, Phaser for the game engine, and TypeScript for the codebase. The architecture is based on a modular structure with separate directories for UI components, Phaser scenes, domain services, shared utilities, and type definitions.
+This project, "WarMail: ATK & DEF," is an open-source browser game. The concept is a tower defense game set in an email inbox, where the player has to fight back enemies while handling incoming emails. The game is built with React for the UI, Phaser for the game engine, and TypeScript for the codebase. The architecture is based on a modular structure with separate directories for UI components, Phaser scenes, domain services, shared utilities, and type definitions.
 
 ## Building and Running
 
