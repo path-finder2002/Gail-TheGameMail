@@ -13,7 +13,6 @@ class AppTheme {
       colorScheme: const ColorScheme.dark(
         primary: primaryColor,
         secondary: Color(0xFF6366F1),
-        background: background,
         surface: surface,
       ),
       scaffoldBackgroundColor: background,

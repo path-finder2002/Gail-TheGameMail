@@ -1,5 +1,5 @@
 name: war_mail_atk_def
-description: MVP implementation of WarMail: ATK & DEF built with Flutter.
+description: 'MVP implementation of WarMail: ATK & DEF built with Flutter.'
 publish_to: 'none'
 version: 0.1.0+1
 
